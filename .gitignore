@@ -1,0 +1,5 @@
+.venv/bin/activate.csh
+.venv/
+bot_env/
+.env
+serviceAccountKey.json
