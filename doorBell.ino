@@ -1,7 +1,12 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 
-const char* ssid = "MCS_Guest";
+const char* ssidSchool = "MCS_Guest";
+const char* ssidHome = "";
+const char* password = "";
+bool atSchool = false; // Set the value to true (or false as needed)
+
+
 const char* firebaseURL = "https://doorbell-338a5-default-rtdb.firebaseio.com/ALERT.json";
 
 void setup() {
@@ -11,7 +16,14 @@ void setup() {
     // Connect to WiFi
     Serial.println("Attempting to connect to WiFi...");
     WiFi.mode(WIFI_STA);
-    WiFi.begin(ssid);
+
+    if (atSchool ==  true){
+      WiFi.begin(ssidSchool);
+    } else {
+      WiFi.begin(ssidHome, password);
+    }
+
+    
 
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
