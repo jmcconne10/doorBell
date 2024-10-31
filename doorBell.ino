@@ -3,8 +3,8 @@
 #include <WiFiClientSecure.h>
 
 const char* ssidSchool = "MCS_Guest";
-const char* ssidHome = "tbd";
-const char* password = "tbd";
+const char* ssidHome = "";
+const char* password = "";
 bool atSchool = false; // Set to true or false as needed
 
 const char* firebaseURL = "https://doorbell-338a5-default-rtdb.firebaseio.com/ALERT.json";
@@ -15,7 +15,6 @@ void setup() {
     Serial.begin(115200);
     delay(100);
     Serial.println();
-    Serial.println("rev6");
 
     // Connect to WiFi
     Serial.println("Attempting to connect to WiFi...");
@@ -55,7 +54,7 @@ void setup() {
                 break;
         }
     }
-    Serial.println("rev10");
+    Serial.println("rev12");
     Serial.println("\nConnected to WiFi!");
     Serial.print("IP Address: ");
     Serial.println(WiFi.localIP());
@@ -78,7 +77,8 @@ void testDNS() {
     }
 }
 
-void getDataFromFirebase() {
+// Updated to return the Firebase value as a String
+String getDataFromFirebase() {
     if (WiFi.status() == WL_CONNECTED) {
         WiFiClientSecure client;      // Use WiFiClientSecure for HTTPS
         client.setInsecure();          // Disable SSL certificate verification
@@ -90,14 +90,13 @@ void getDataFromFirebase() {
         // Start connection and send HTTP GET request
         http.begin(client, firebaseURL); // Pass WiFiClientSecure and URL
         int httpCode = http.GET();
+        String payload = "";  // Initialize payload as an empty string
 
         // Check the returning HTTP code
         if (httpCode > 0) {
             Serial.printf("HTTP GET code: %d\n", httpCode);
             if (httpCode == HTTP_CODE_OK) {
-                String payload = http.getString();
-                Serial.println("Received payload:");
-                Serial.println(payload);  // Print the value of ALERT.json
+                payload = http.getString();  // Store the received value in payload
             }
         } else {
             Serial.printf("GET request failed, error: %s\n", http.errorToString(httpCode).c_str());
@@ -105,8 +104,10 @@ void getDataFromFirebase() {
 
         // End the HTTP connection
         http.end();
+        return payload;  // Return the received payload
     } else {
         Serial.println("WiFi not connected");
+        return "";  // Return an empty string if not connected
     }
 }
 
@@ -114,6 +115,16 @@ void loop() {
     unsigned long currentMillis = millis();
     if (currentMillis - previousMillis >= interval) {
         previousMillis = currentMillis;
-        getDataFromFirebase();  // Call every 5 seconds
+        
+        // Call getDataFromFirebase and store the result in a variable
+        String firebaseValue = getDataFromFirebase();
+        
+        // Print the value if it's not empty
+        if (firebaseValue.length() > 0) {
+            Serial.print("Received Firebase value: ");
+            Serial.println(firebaseValue);
+        } else {
+            Serial.println("No data received from Firebase.");
+        }
     }
 }
