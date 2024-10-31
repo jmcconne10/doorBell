@@ -1,29 +1,28 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
+#include <WiFiClientSecure.h>
 
 const char* ssidSchool = "MCS_Guest";
-const char* ssidHome = "";
-const char* password = "";
+const char* ssidHome = "tbd";
+const char* password = "tbd";
 bool atSchool = false; // Set the value to true (or false as needed)
-
 
 const char* firebaseURL = "https://doorbell-338a5-default-rtdb.firebaseio.com/ALERT.json";
 
 void setup() {
     Serial.begin(115200);
     delay(100);
+    Serial.println();
 
     // Connect to WiFi
     Serial.println("Attempting to connect to WiFi...");
     WiFi.mode(WIFI_STA);
 
-    if (atSchool ==  true){
-      WiFi.begin(ssidSchool);
+    if (atSchool) {
+        WiFi.begin(ssidSchool);
     } else {
-      WiFi.begin(ssidHome, password);
+        WiFi.begin(ssidHome, password);
     }
-
-    
 
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
@@ -53,32 +52,49 @@ void setup() {
                 break;
         }
     }
+    Serial.println("rev10");
     Serial.println("\nConnected to WiFi!");
     Serial.print("IP Address: ");
     Serial.println(WiFi.localIP());
+
+    // Test DNS Resolution
+    testDNS();
 
     // Fetch data from Firebase
     getDataFromFirebase();
 }
 
+void testDNS() {
+    const char* testHost = "example.com";
+    Serial.print("Resolving DNS for ");
+    Serial.println(testHost);
+
+    IPAddress testIP;
+    if (WiFi.hostByName(testHost, testIP)) {
+        Serial.print("DNS lookup succeeded. IP Address: ");
+        Serial.println(testIP);
+    } else {
+        Serial.println("DNS lookup failed.");
+    }
+}
+
 void getDataFromFirebase() {
     if (WiFi.status() == WL_CONNECTED) {
-        WiFiClient client;              // Create a WiFiClient object
+        WiFiClientSecure client;      // Use WiFiClientSecure for HTTPS
+        client.setInsecure();          // Disable SSL certificate verification
         HTTPClient http;
 
         Serial.print("Connecting to ");
         Serial.println(firebaseURL);
 
         // Start connection and send HTTP GET request
-        http.begin(client, firebaseURL); // Pass WiFiClient object and URL
+        http.begin(client, firebaseURL); // Pass WiFiClientSecure and URL
         int httpCode = http.GET();
 
         // Check the returning HTTP code
         if (httpCode > 0) {
-            // HTTP header has been received and is positive
             Serial.printf("HTTP GET code: %d\n", httpCode);
             if (httpCode == HTTP_CODE_OK) {
-                // Parse the response payload
                 String payload = http.getString();
                 Serial.println("Received payload:");
                 Serial.println(payload);  // Print the value of ALERT.json
