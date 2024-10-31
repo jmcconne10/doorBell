@@ -5,14 +5,17 @@
 const char* ssidSchool = "MCS_Guest";
 const char* ssidHome = "tbd";
 const char* password = "tbd";
-bool atSchool = false; // Set the value to true (or false as needed)
+bool atSchool = false; // Set to true or false as needed
 
 const char* firebaseURL = "https://doorbell-338a5-default-rtdb.firebaseio.com/ALERT.json";
+unsigned long previousMillis = 0; // Store last request time
+const long interval = 5000;       // Interval set to 5 seconds
 
 void setup() {
     Serial.begin(115200);
     delay(100);
     Serial.println();
+    Serial.println("rev6");
 
     // Connect to WiFi
     Serial.println("Attempting to connect to WiFi...");
@@ -59,9 +62,6 @@ void setup() {
 
     // Test DNS Resolution
     testDNS();
-
-    // Fetch data from Firebase
-    getDataFromFirebase();
 }
 
 void testDNS() {
@@ -111,5 +111,9 @@ void getDataFromFirebase() {
 }
 
 void loop() {
-    // Keep the loop empty
+    unsigned long currentMillis = millis();
+    if (currentMillis - previousMillis >= interval) {
+        previousMillis = currentMillis;
+        getDataFromFirebase();  // Call every 5 seconds
+    }
 }
