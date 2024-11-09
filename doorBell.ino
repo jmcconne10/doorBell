@@ -16,7 +16,7 @@ unsigned long ledPreviousMillis = 0; // Timer for blinking LED
 unsigned long alertResetMillis = 0; // Timer for resetting ALERT
 bool ledState = LOW;
 bool alertActive = false; // New flag to track ALERT state
-int rev = 40;
+int rev = 41;
 
 void setup() {
     Serial.begin(115200);
@@ -149,12 +149,9 @@ void loop() {
             digitalWrite(LED_BUILTIN, LOW); // Turn LED on (LOW is on for built-in LED)
             ledState = LOW;                 // Ensure LED stays on
         } else if (firebaseValue == "false") {
-            // Blink the LED if the value is false
-            if (currentMillis - ledPreviousMillis >= blinkInterval) {
-                ledPreviousMillis = currentMillis;
-                ledState = !ledState;        // Toggle LED state
-                digitalWrite(LED_BUILTIN, ledState);
-            }
+            // Turn off the LED if the value is false
+            digitalWrite(LED_BUILTIN, HIGH);
+            ledState = HIGH;  
         } else {
             Serial.println("No valid data received from Firebase.");
         }
