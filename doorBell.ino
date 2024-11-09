@@ -14,6 +14,8 @@ const long valueCheckInterval = 5000;
 const long resetInterval = valueCheckInterval - 500;
 unsigned long alertResetMillis = 0;
 bool alertActive = false;
+bool ledState = LOW; // Used for built-in LED
+int rev = 42; //Used to help identify what code is on esp
 
 // LED strip settings
 #define LED_PIN    D5      // Pin connected to the data line of the LEDs
@@ -24,6 +26,7 @@ void setup() {
     Serial.begin(115200);
     delay(100);
     Serial.println();
+    pinMode(LED_BUILTIN, OUTPUT);  // Set built-in LED as output
 
     // Initialize LED strip
     strip.begin();
@@ -47,6 +50,9 @@ void setup() {
         delay(500);
         Serial.print(".");
     }
+    Serial.println("");
+    Serial.print("Rev ");
+    Serial.println(rev);
     Serial.println("\nConnected to WiFi!");
     Serial.print("IP Address: ");
     Serial.println(WiFi.localIP());
@@ -148,8 +154,14 @@ void loop() {
             alertActive = true;
             alertResetMillis = currentMillis;
             turnOnLEDStrip(); // Turn on LED strip when ALERT is true
+            // Turn on the LED if the value is true
+            digitalWrite(LED_BUILTIN, LOW); // Turn LED on (LOW is on for built-in LED)
+            ledState = LOW;                 // Ensure LED stays on
         } else if (firebaseValue == "false") {
             turnOffLEDStrip(); // Turn off LED strip when ALERT is false
+            // Turn off the LED if the value is false
+            digitalWrite(LED_BUILTIN, HIGH);
+            ledState = HIGH;  
         } else {
             Serial.println("No valid data received from Firebase.");
         }
