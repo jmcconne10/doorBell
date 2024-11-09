@@ -10,11 +10,18 @@ bool atSchool = false; // Set to true or false as needed
 const char* firebaseURL = "https://doorbell-338a5-default-rtdb.firebaseio.com/ALERT.json";
 unsigned long previousMillis = 0; // Store last request time
 const long interval = 5000;       // Interval set to 5 seconds
+unsigned long blinkInterval = 20; // LED blink interval in milliseconds
+unsigned long ledPreviousMillis = 0; // Timer for blinking LED
+bool ledState = LOW;
+int rev = 31;
 
 void setup() {
     Serial.begin(115200);
     delay(100);
     Serial.println();
+
+    pinMode(LED_BUILTIN, OUTPUT);  // Set built-in LED as output
+    delay(5000);
 
     // Connect to WiFi
     Serial.println("Attempting to connect to WiFi...");
@@ -29,32 +36,7 @@ void setup() {
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
         Serial.print(".");
-
-        // Print WiFi status for debugging
-        int status = WiFi.status();
-        switch (status) {
-            case WL_IDLE_STATUS:
-                Serial.println(" WiFi Status: IDLE");
-                break;
-            case WL_NO_SSID_AVAIL:
-                Serial.println(" WiFi Status: SSID not available");
-                break;
-            case WL_CONNECT_FAILED:
-                Serial.println(" WiFi Status: Connection failed");
-                break;
-            case WL_CONNECTION_LOST:
-                Serial.println(" WiFi Status: Connection lost");
-                break;
-            case WL_DISCONNECTED:
-                Serial.println(" WiFi Status: Disconnected");
-                break;
-            default:
-                Serial.print(" WiFi Status Code: ");
-                Serial.println(status);
-                break;
-        }
     }
-    Serial.println("rev12");
     Serial.println("\nConnected to WiFi!");
     Serial.print("IP Address: ");
     Serial.println(WiFi.localIP());
@@ -77,7 +59,7 @@ void testDNS() {
     }
 }
 
-// Updated to return the Firebase value as a String
+// Modified to return the Firebase value as a String
 String getDataFromFirebase() {
     if (WiFi.status() == WL_CONNECTED) {
         WiFiClientSecure client;      // Use WiFiClientSecure for HTTPS
@@ -95,6 +77,8 @@ String getDataFromFirebase() {
         // Check the returning HTTP code
         if (httpCode > 0) {
             Serial.printf("HTTP GET code: %d\n", httpCode);
+            Serial.print("Rev ");
+            Serial.println(rev);
             if (httpCode == HTTP_CODE_OK) {
                 payload = http.getString();  // Store the received value in payload
             }
@@ -113,18 +97,31 @@ String getDataFromFirebase() {
 
 void loop() {
     unsigned long currentMillis = millis();
+
+    // Fetch the Firebase data every 5 seconds
     if (currentMillis - previousMillis >= interval) {
         previousMillis = currentMillis;
         
         // Call getDataFromFirebase and store the result in a variable
         String firebaseValue = getDataFromFirebase();
+
+        Serial.print("Received Firebase value: ");
+        Serial.println(firebaseValue);
         
-        // Print the value if it's not empty
-        if (firebaseValue.length() > 0) {
-            Serial.print("Received Firebase value: ");
-            Serial.println(firebaseValue);
+        // Check the Firebase value
+        if (firebaseValue == "true") {
+            digitalWrite(LED_BUILTIN, LOW); // Turn LED on (LOW is on for built-in LED)
+            ledState = LOW;                 // Ensure LED stays on
+        } else if (firebaseValue == "false") {
+            // Blink the LED if the value is false
+            if (currentMillis - ledPreviousMillis >= blinkInterval) {
+                ledPreviousMillis = currentMillis;
+                ledState = !ledState;        // Toggle LED state
+                digitalWrite(LED_BUILTIN, ledState);
+            }
         } else {
-            Serial.println("No data received from Firebase.");
+            Serial.println("No valid data received from Firebase.");
         }
     }
+
 }
