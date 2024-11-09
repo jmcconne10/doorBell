@@ -1,6 +1,13 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <WiFiClientSecure.h>
+#include <Adafruit_NeoPixel.h>
+
+// Define the number of LEDs in your strip
+#define NUM_LEDS 30  // Adjust this to match your strip length
+#define LED_PIN D5  // Set this to the pin connected to the data line
+
+Adafruit_NeoPixel strip(NUM_LEDS, LED_PIN, NEO_GRB + NEO_KHZ800);
 
 const char* ssidSchool = "MCS_Guest";
 const char* ssidHome = "";
@@ -46,6 +53,19 @@ void setup() {
 
     // Test DNS Resolution
     testDNS();
+
+    // Initialize the LED strip
+    strip.begin();
+    strip.setBrightness(50); // Adjust brightness (0 to 255)
+    strip.show();            // Initialize all pixels to 'off'
+
+    // Set all LEDs to red
+    for (int i = 0; i < NUM_LEDS; i++) {
+        strip.setPixelColor(i, strip.Color(255, 0, 0)); // Red color
+    }
+
+    strip.show(); // Update the strip with the new color
+
 }
 
 void testDNS() {
