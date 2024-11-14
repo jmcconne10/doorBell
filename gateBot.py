@@ -24,7 +24,7 @@ intents.message_content = True  # Required to read message content
 client = discord.Client(intents=intents)
 
 # Replace 'your_channel_id' with the actual ID of the channel
-TARGET_CHANNEL_ID = 1298099576540237825  # Copy the channel ID here
+TARGET_CHANNEL_ID = 1306613834844344430  # Copy the channel ID here
 
 # Function to update Firebase
 def update_firebase_alert(value):
