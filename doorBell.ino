@@ -4,8 +4,8 @@
 #include <Adafruit_NeoPixel.h>
 
 const char* ssidSchool = "MCS_Guest";
-const char* ssidHome = "";
-const char* password = "";
+const char* ssidHome = "Loading";
+const char* password = "Jor-el10";
 bool atSchool = false;
 
 const char* firebaseURL = "https://doorbell-338a5-default-rtdb.firebaseio.com/ALERT.json";
@@ -15,12 +15,15 @@ const long resetInterval = valueCheckInterval - 500;
 unsigned long alertResetMillis = 0;
 bool alertActive = false;
 bool ledState = LOW; // Used for built-in LED
-int rev = 42; //Used to help identify what code is on esp
+int rev = 43; //Used to help identify what code is on esp
 
 // LED strip settings
 #define LED_PIN    D5      // Pin connected to the data line of the LEDs
-#define NUM_LEDS   30      // Number of LEDs in your strip
+#define NUM_LEDS   300      // Number of LEDs in your strip
 Adafruit_NeoPixel strip(NUM_LEDS, LED_PIN, NEO_GRB + NEO_KHZ800);
+
+// Buzzer Ping
+int buzzerPin = D6;
 
 void setup() {
     Serial.begin(115200);
@@ -42,8 +45,10 @@ void setup() {
 
     if (atSchool) {
         WiFi.begin(ssidSchool);
+        Serial.println("At School");
     } else {
         WiFi.begin(ssidHome, password);
+        Serial.println("At Home");
     }
 
     while (WiFi.status() != WL_CONNECTED) {
@@ -74,6 +79,14 @@ void turnOffLEDStrip() {
     }
     strip.show();
     Serial.println("LED strip turned OFF.");
+}
+
+void turnOnBuzzer() {
+  tone(buzzerPin, 4000); // Generate a 4 kHz tone
+}
+
+void turnOffBuzzer() {
+  noTone(buzzerPin); // Stop the tone
 }
 
 // Function to get data from Firebase
@@ -154,11 +167,13 @@ void loop() {
             alertActive = true;
             alertResetMillis = currentMillis;
             turnOnLEDStrip(); // Turn on LED strip when ALERT is true
+            turnOnBuzzer(); // Turn on Buzzer
             // Turn on the LED if the value is true
             digitalWrite(LED_BUILTIN, LOW); // Turn LED on (LOW is on for built-in LED)
             ledState = LOW;                 // Ensure LED stays on
         } else if (firebaseValue == "false") {
             turnOffLEDStrip(); // Turn off LED strip when ALERT is false
+            turnOffBuzzer(); //Turn off the Buzzer
             // Turn off the LED if the value is false
             digitalWrite(LED_BUILTIN, HIGH);
             ledState = HIGH;  
