@@ -4,8 +4,8 @@
 #include <Adafruit_NeoPixel.h>
 
 const char* ssidSchool = "MCS_Guest";
-const char* ssidHome = "Loading";
-const char* password = "Jor-el10";
+const char* ssidHome = "";
+const char* password = "";
 bool atSchool = false;
 
 const char* firebaseURL = "https://doorbell-338a5-default-rtdb.firebaseio.com/ALERT.json";
@@ -37,7 +37,7 @@ void setup() {
     strip.show(); // Initialize all pixels to 'off'
 
     pinMode(LED_BUILTIN, OUTPUT);
-    delay(5000);
+    delay(1000);
 
     // Connect to WiFi
     Serial.println("Attempting to connect to WiFi...");
@@ -151,6 +151,26 @@ void updateFirebaseToFalse() {
 
 void loop() {
     unsigned long currentMillis = millis();
+
+    // Reconnect to WiFi if disconnected
+    if (WiFi.status() != WL_CONNECTED) {
+        Serial.println("WiFi lost connection, attempting to reconnect...");
+        WiFi.disconnect();
+        delay(1000);
+        if (atSchool) {
+            WiFi.begin(ssidSchool);
+        } else {
+            WiFi.begin(ssidHome, password);
+        }
+        // Wait for connection
+        while (WiFi.status() != WL_CONNECTED) {
+            delay(500);
+            Serial.print(".");
+        }
+        Serial.println("\nReconnected to WiFi!");
+        Serial.print("IP Address: ");
+        Serial.println(WiFi.localIP());
+    }
 
     // Fetch the Firebase data every 5 seconds
     if (currentMillis - previousMillis >= valueCheckInterval) {
