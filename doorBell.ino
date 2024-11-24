@@ -40,10 +40,12 @@ void connectToWiFi() {
     while (WiFi.status() != WL_CONNECTED) {
         // Blink the first LED in the strip to green while trying to connect
         strip.setPixelColor(0, strip.Color(0, 255, 0)); // Green color
+        digitalWrite(LED_BUILTIN, LOW); // Turn LED on (LOW is on for built-in LED)
         strip.show();
         delay(500);
         strip.setPixelColor(0, strip.Color(0, 0, 0)); // Turn off the LED
         strip.show();
+        digitalWrite(LED_BUILTIN, HIGH); // Turn LED off (HIGH is off for built-in LED)
         delay(500);
         Serial.print(".");
     }
@@ -142,8 +144,9 @@ void loop() {
         delay(1000);
         connectToWiFi();
     } else {
-        strip.setPixelColor(0, strip.Color(0, 0, 255)); // Turn off the LED
+        strip.setPixelColor(0, strip.Color(0, 0, 255)); // Turn LED to blue when connected to wifi
         strip.show();
+        digitalWrite(LED_BUILTIN, LOW); // Turn LED on (LOW is on for built-in LED)
     }
 
     // Fetch the Firebase data every 5 seconds
