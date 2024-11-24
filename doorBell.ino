@@ -25,21 +25,7 @@ Adafruit_NeoPixel strip(NUM_LEDS, LED_PIN, NEO_GRB + NEO_KHZ800);
 // Buzzer Ping
 int buzzerPin = D6;
 
-void setup() {
-    Serial.begin(115200);
-    delay(100);
-    Serial.println();
-    pinMode(LED_BUILTIN, OUTPUT);  // Set built-in LED as output
-
-    // Initialize LED strip
-    strip.begin();
-    strip.setBrightness(50);
-    strip.show(); // Initialize all pixels to 'off'
-
-    pinMode(LED_BUILTIN, OUTPUT);
-    delay(1000);
-
-    // Connect to WiFi
+void connectToWiFi() {
     Serial.println("Attempting to connect to WiFi...");
     WiFi.mode(WIFI_STA);
 
@@ -61,6 +47,24 @@ void setup() {
     Serial.println("\nConnected to WiFi!");
     Serial.print("IP Address: ");
     Serial.println(WiFi.localIP());
+}
+
+void setup() {
+    Serial.begin(115200);
+    delay(100);
+    Serial.println();
+    pinMode(LED_BUILTIN, OUTPUT);  // Set built-in LED as output
+
+    // Initialize LED strip
+    strip.begin();
+    strip.setBrightness(50);
+    strip.show(); // Initialize all pixels to 'off'
+
+    pinMode(LED_BUILTIN, OUTPUT);
+    delay(1000);
+
+    // Connect to WiFi
+    connectToWiFi();
 }
 
 // Function to turn on the LED strip (set all LEDs to red)
@@ -120,35 +124,6 @@ String getDataFromFirebase() {
     }
 }
 
-// Function to update Firebase to false
-void updateFirebaseToFalse() {
-    if (WiFi.status() == WL_CONNECTED) {
-        WiFiClientSecure client;
-        client.setInsecure();
-        HTTPClient http;
-
-        Serial.print("Updating Firebase to false at ");
-        Serial.println(firebaseURL);
-
-        http.begin(client, firebaseURL);
-        http.addHeader("Content-Type", "application/json");
-        int httpCode = http.PUT("false");
-
-        if (httpCode > 0) {
-            Serial.printf("HTTP PUT code: %d\n", httpCode);
-            if (httpCode == HTTP_CODE_OK) {
-                Serial.println("Successfully updated Firebase to false.");
-            }
-        } else {
-            Serial.printf("PUT request failed, error: %s\n", http.errorToString(httpCode).c_str());
-        }
-
-        http.end();
-    } else {
-        Serial.println("WiFi not connected. Failed to update Firebase.");
-    }
-}
-
 void loop() {
     unsigned long currentMillis = millis();
 
@@ -157,19 +132,7 @@ void loop() {
         Serial.println("WiFi lost connection, attempting to reconnect...");
         WiFi.disconnect();
         delay(1000);
-        if (atSchool) {
-            WiFi.begin(ssidSchool);
-        } else {
-            WiFi.begin(ssidHome, password);
-        }
-        // Wait for connection
-        while (WiFi.status() != WL_CONNECTED) {
-            delay(500);
-            Serial.print(".");
-        }
-        Serial.println("\nReconnected to WiFi!");
-        Serial.print("IP Address: ");
-        Serial.println(WiFi.localIP());
+        connectToWiFi();
     }
 
     // Fetch the Firebase data every 5 seconds
