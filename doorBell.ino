@@ -15,7 +15,7 @@ const long resetInterval = valueCheckInterval - 500;
 unsigned long alertResetMillis = 0;
 bool alertActive = false;
 bool ledState = LOW; // Used for built-in LED
-int rev = 43; //Used to help identify what code is on esp
+int rev = 44; //Used to help identify what code is on esp
 
 // LED strip settings
 #define LED_PIN    D5      // Pin connected to the data line of the LEDs
@@ -200,13 +200,5 @@ void loop() {
         } else {
             Serial.println("No valid data received from Firebase.");
         }
-    }
-
-    // Check if alertActive is true and reset it after 5 seconds
-    if (alertActive && (currentMillis - alertResetMillis >= resetInterval)) {
-        alertActive = false;
-        Serial.println("ALERT reset to false in Firebase");
-        turnOffLEDStrip(); // Turn off LED strip before updating Firebase
-        updateFirebaseToFalse();
     }
 }
