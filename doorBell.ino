@@ -4,13 +4,13 @@
 #include <Adafruit_NeoPixel.h>
 
 const char* ssidSchool = "MCS_Guest";
-const char* ssidHome = "";
+const char* ssidHome = "MCS_Guest";
 const char* password = "";
 bool atSchool = false;
 
 const char* firebaseURL = "https://doorbell-338a5-default-rtdb.firebaseio.com/ALERT.json";
 unsigned long previousMillis = 0;
-const long valueCheckInterval = 5000;
+const long valueCheckInterval = 1000;
 const long resetInterval = valueCheckInterval - 500;
 unsigned long alertResetMillis = 0;
 bool alertActive = false;
@@ -38,9 +38,17 @@ void connectToWiFi() {
     }
 
     while (WiFi.status() != WL_CONNECTED) {
+        // Blink the first LED in the strip to green while trying to connect
+        strip.setPixelColor(0, strip.Color(0, 255, 0)); // Green color
+        strip.show();
+        delay(500);
+        strip.setPixelColor(0, strip.Color(0, 0, 0)); // Turn off the LED
+        strip.show();
         delay(500);
         Serial.print(".");
     }
+    strip.setPixelColor(0, strip.Color(0, 0, 0)); // Turn off the LED after connection
+    strip.show();
     Serial.println("");
     Serial.print("Rev ");
     Serial.println(rev);
@@ -133,6 +141,9 @@ void loop() {
         WiFi.disconnect();
         delay(1000);
         connectToWiFi();
+    } else {
+        strip.setPixelColor(0, strip.Color(0, 0, 255)); // Turn off the LED
+        strip.show();
     }
 
     // Fetch the Firebase data every 5 seconds
