@@ -15,7 +15,7 @@ const long resetInterval = valueCheckInterval - 500;
 unsigned long alertResetMillis = 0;
 bool alertActive = false;
 bool ledState = LOW; // Used for built-in LED
-int rev = 44; //Used to help identify what code is on esp
+int rev = 50; //Used to help identify what code is on esp
 
 // LED strip settings
 #define LED_PIN    D5      // Pin connected to the data line of the LEDs
