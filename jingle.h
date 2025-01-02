@@ -1,4 +1,7 @@
-#include <ESP8266WiFi.h>
+#ifndef MUSIC_H
+#define MUSIC_H
+
+#include <Arduino.h>
 
 
 
@@ -171,13 +174,13 @@ COMPOSE(c_scale_notes, C_Scale, play_c_scale, 60, 15)
 // —— Run-Time Stuff —— //
 
 
+// Pretty sure I need to remove this, so it can be included in main code
+// void setup() {
+//   play_vitality();
+//   play_vitality();
+// }
 
-void setup() {
-  play_vitality();
-  play_vitality();
-}
-
-void loop() {}
+// void loop() {}
 
 
 
@@ -253,3 +256,5 @@ const double bad_apple_notes[66][2] = {
 };
 
 COMPOSE(bad_apple_notes, Bad_Apple, play_bad_apple, 138, 66)
+
+#endif

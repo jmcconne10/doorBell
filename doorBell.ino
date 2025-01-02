@@ -2,6 +2,7 @@
 #include <ESP8266HTTPClient.h>
 #include <WiFiClientSecure.h>
 #include <Adafruit_NeoPixel.h>
+#include "jingle.h"
 
 const char* ssidSchool = "MCS_Guest";
 const char* ssidHome = "MCS_Guest";
@@ -164,7 +165,8 @@ void loop() {
             alertActive = true;
             alertResetMillis = currentMillis;
             turnOnLEDStrip(); // Turn on LED strip when ALERT is true
-            turnOnBuzzer(); // Turn on Buzzer
+            //turnOnBuzzer(); // Turn on Buzzer
+            play_industry_baby();
             // Turn on the LED if the value is true
             digitalWrite(LED_BUILTIN, LOW); // Turn LED on (LOW is on for built-in LED)
             ledState = LOW;                 // Ensure LED stays on
