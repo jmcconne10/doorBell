@@ -26,11 +26,24 @@ client = discord.Client(intents=intents)
 # Replace 'your_channel_id' with the actual ID of the channel
 TARGET_CHANNEL_ID = 1306613834844344430  # Copy the channel ID here
 
-# Function to update Firebase
+# Function to update Firebase for Alert
 def update_firebase_alert(value):
     ref = db.reference("ALERT")
     ref.set(value)  # Set the ALERT value to the provided value
     print(f"Firebase ALERT set to {value}")
+
+def update_firebase_user(value):
+    ref = db.reference("USER")
+    if isinstance(value, (discord.Member, discord.User)):
+        # Store only the user's name
+        user_name = value.name
+        ref.set(user_name)  # Store the name in Firebase
+        print(f"Firebase USER set to {user_name}")
+    else:
+        # If value is not a user, store it directly
+        ref.set(value)
+        print(f"Firebase USER set to {value}")
+
 
 @client.event
 async def on_ready():
@@ -44,10 +57,13 @@ async def on_message(message):
         if message.content == "!gate":
             print("Gate command received")
             update_firebase_alert(True)  # Update Firebase when !gate is received
+            update_firebase_user(message.author)
+
             
             # Wait for 10 seconds, then reset the ALERT to False
             await asyncio.sleep(setSleep)
             update_firebase_alert(False)  # Reset ALERT to False after 10 seconds
+            update_firebase_user("")
 
 # Run the bot with your token
 client.run(TOKEN)
