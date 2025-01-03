@@ -3,6 +3,8 @@
 #include <WiFiClientSecure.h>
 #include <Adafruit_NeoPixel.h>
 #include "jingle.h"
+#include "UserSongs.h"
+
 
 const char* ssidSchool = "MCS_Guest";
 const char* ssidHome = "MCS_Guest";
@@ -183,7 +185,7 @@ void loop() {
     // Fetch the Firebase data every 5 seconds
     if (currentMillis - previousMillis >= valueCheckInterval) {
         previousMillis = currentMillis;
-        
+
         // Get both ALERT and USER values
         FirebaseData firebaseData = getDataFromFirebase();
 
@@ -191,24 +193,31 @@ void loop() {
         Serial.println(firebaseData.alertValue);
         Serial.print("Received USER value: ");
         Serial.println(firebaseData.userValue);
-        
+
         // Check the Firebase value
         if (firebaseData.alertValue == "true") {
-          
             // Remove quotes from userValue
             String trimmedUserValue = trimQuotes(firebaseData.userValue);
-  
+
             alertActive = true;
             alertResetMillis = currentMillis;
             turnOnLEDStrip(); // Turn on LED strip when ALERT is true
-            //Play Song
-            if (trimmedUserValue == "mrmcconnell10") {
-              play_vitality();
-              Serial.println("Mr McConnell Found");
-            } else {
-              play_industry_baby();
-              Serial.print(trimmedUserValue);
-              Serial.println(" is not mrmcconnell10");
+
+            // Find the user in the array and play their song
+            bool userFound = false;
+            for (int i = 0; i < userCount; i++) {
+                if (userSongs[i].userName == trimmedUserValue) {
+                    userSongs[i].playSong(); // Call the song function
+                    Serial.print("Playing song for ");
+                    Serial.println(userSongs[i].userName);
+                    userFound = true;
+                    break;
+                }
+            }
+
+            if (!userFound) {
+                Serial.println("No song found for this user.");
+                turnOnBuzzer();
             }
 
             // Turn on the LED if the value is true
@@ -216,12 +225,13 @@ void loop() {
             ledState = LOW;                 // Ensure LED stays on
         } else if (firebaseData.alertValue == "false") {
             turnOffLEDStrip(); // Turn off LED strip when ALERT is false
-            turnOffBuzzer(); //Turn off the Buzzer
+            turnOffBuzzer();   // Turn off the Buzzer
             // Turn off the LED if the value is false
             digitalWrite(LED_BUILTIN, HIGH);
-            ledState = HIGH;  
+            ledState = HIGH;
         } else {
             Serial.println("No valid data received from Firebase.");
         }
     }
 }
+
