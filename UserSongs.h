@@ -13,7 +13,7 @@ struct UserSong {
 // Define the user-song array
 UserSong userSongs[] = {
     {"mrmcconnell10", play_vitality},
-    {"brendan_mcconnell", play_industry_baby},
+    {"brendan_mcconnell", play_imperial_march},
     // Add more users and their corresponding songs here
 };
 
