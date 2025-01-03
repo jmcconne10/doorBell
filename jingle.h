@@ -169,10 +169,11 @@ const double c_scale_notes[15][2] = {
 
 // Step 3 //
 
- 		[Macro Notes]		  [Function Name]
+ 		[Macro Notes]		  [Function Name]	[Length]
 COMPOSE(c_scale_notes, C_Scale, play_c_scale, 60, 15)
-					 [Song Name]	
+					 [Song Name]	        [Tempo]
 */
+
 
 
 // —— Song Listings —— //
@@ -185,11 +186,11 @@ COMPOSE(c_scale_notes, C_Scale, play_c_scale, 60, 15)
 // Bad Apple!!         | bad_apple_notes          | Bad_Apple             | play_bad_apple()
 // Bad Apple!! (Intro) | bad_apple_intro_notes    | Bad_Apple_Intro       | play_bad_apple_intro()
 // Bad Apple!! (Bridge)| bad_apple_bridge_notes   | Bad_Apple_Bridge      | play_bad_apple_bridge()
+// Imperial March      | imperial_march_notes     | Imperial_March        | play_imperial_march()
+// You're A Mean One   | mean_one_notes           | Mean_One              | play_mean_one()
 
 /// Todo List
 
-// Imperial March
-// The Grinch
 // Through The Fire And Flames
 // 9mm
 // Smooth Criminal
@@ -202,86 +203,127 @@ COMPOSE(c_scale_notes, C_Scale, play_c_scale, 60, 15)
 // Your New Home
 
 const double vitality_notes[66][2] = {
-	C(4, 2), R(2), G(4, 2), Eb(4, 2), R(2), C(4, 2), R(2), C(5, 2), // 8 Notes
-	R(2), C(4, 2), R(2), Eb(4, 2), R(2), C(4, 2), D(4, 2), Eb(4, 2), // 8 Notes
-	G(4, 2), R(2), C(5, 2), D(5, 2), R(2), G(4, 2), R(2), B(4, 2), // 8 Notes
-	R(2), G(4, 2), R(2), Eb(4, 2), R(2), G(4, 2), F_(4, 2), Eb(4, 2), // 8 Notes
-
-	C(4, 2), R(2), G(4, 2), Eb(4, 2), R(2), C(4, 2), R(2), D(4, 2), // 8 Notes
-  	R(2), C(4, 2), R(2), Eb(4, 2), R(2), C(4, 2), D(4, 2), Eb(4, 2), // 8 Notes
-  	G(4, 2), R(2), Eb(4, 2), G(4, 2), R(2), Eb(4, 2), R(2), G(4, 2), // 8 Notes
-  	R(2), Eb(4, 2), R(2), Bb(4, 3), G(4, 3), F_(4, 3), Eb(4, 3), D(4, 2), Eb(4, 2), D(4, 2), // 10 Notes
+	C(4, 2), R(2), G(4, 2), Eb(4, 2), R(2), C(4, 2), R(2), C(5, 2),    // 8 Notes
+	R(2), C(4, 2), R(2), Eb(4, 2), R(2), C(4, 2), D(4, 2), Eb(4, 2),   // 8 Notes
+	G(4, 2), R(2), C(5, 2), D(5, 2), R(2), G(4, 2), R(2), B(4, 2),     // 8 Notes
+	R(2), G(4, 2), R(2), Eb(4, 2), R(2), G(4, 2), F_(4, 2), Eb(4, 2),  // 8 Notes
+	
+	C(4, 2), R(2), G(4, 2), Eb(4, 2), R(2), C(4, 2), R(2), D(4, 2),                           // 8 Notes
+	R(2), C(4, 2), R(2), Eb(4, 2), R(2), C(4, 2), D(4, 2), Eb(4, 2),                          // 8 Notes
+	G(4, 2), R(2), Eb(4, 2), G(4, 2), R(2), Eb(4, 2), R(2), G(4, 2),                          // 8 Notes
+	R(2), Eb(4, 2), R(2), Bb(4, 3), G(4, 3), F_(4, 3), Eb(4, 3), D(4, 2), Eb(4, 2), D(4, 2),  // 10 Notes
 };
 
 COMPOSE(vitality_notes, Vitality, play_vitality, 300, 66)
 
 const double industry_baby_notes[83][2] = {
-  	D(3, 3), R(3), tD(3, 3, 1), tR(3, 1), tD(3, 3, 1), tR(3, 1), tD(3, 3, 1), tR(3, 1), D(3, 3), R(3), D(3, 3), R(3), // 12 Notes
-  	A(3, 3), R(3), tA(3, 3, 1), tR(3, 1), tA(3, 3, 1), tR(3, 1), tA(3, 3, 1), tR(3, 1), A(3, 3), R(3), A(3, 3), R(3), // 12 Notes
-  	D(4, 3), R(3), tD(4, 3, 1), tR(3, 1), tD(4, 3, 1), tR(3, 1), tD(4, 3, 1), tR(3, 1), D(4, 3), R(3), D(4, 3), R(3), // 12 Notes
-  	D(4, 1), D(4, 2), R(2), // 3 Notes
-
-  	A(3, 3), G(3, 3), F_(3, 1), G(3, 3), F_(3, 3), // 5 Notes
-  	E(3, 2), E(3, 3), R(3), E(3, 4), R(4), E(3, 4), R(4), E(3, 4), R(4), E(3, 4), R(4), // 11 Notes
-  	F_(3, 3), E(3, 3), D(3, 1), D(3, 2), // 4 Notes
-  	R(2), D(3, 2), E(3, 2), F_(3, 2), // 4 Notes
-
-  	A(3, 3), G(3, 3), F_(3, 1), G(3, 3), F_(3, 3), // 5 Notes
-  	E(3, 2), E(3, 3), R(3), E(3, 4), R(4), E(3, 4), R(4), E(3, 4), R(4), E(3, 4), R(4), // 11 Notes
-  	F_(3, 3), E(3, 3), D(3, 1), D(3, 2), // 4 Notes
+	D(3, 3), R(3), tD(3, 3, 1), tR(3, 1), tD(3, 3, 1), tR(3, 1), tD(3, 3, 1), tR(3, 1), D(3, 3), R(3), D(3, 3), R(3),  // 12 Notes
+	A(3, 3), R(3), tA(3, 3, 1), tR(3, 1), tA(3, 3, 1), tR(3, 1), tA(3, 3, 1), tR(3, 1), A(3, 3), R(3), A(3, 3), R(3),  // 12 Notes
+	D(4, 3), R(3), tD(4, 3, 1), tR(3, 1), tD(4, 3, 1), tR(3, 1), tD(4, 3, 1), tR(3, 1), D(4, 3), R(3), D(4, 3), R(3),  // 12 Notes
+	D(4, 1), D(4, 2), R(2),                                                                                            // 3 Notes
+	
+	A(3, 3), G(3, 3), F_(3, 1), G(3, 3), F_(3, 3),                                       // 5 Notes
+	E(3, 2), E(3, 3), R(3), E(3, 4), R(4), E(3, 4), R(4), E(3, 4), R(4), E(3, 4), R(4),  // 11 Notes
+	F_(3, 3), E(3, 3), D(3, 1), D(3, 2),                                                 // 4 Notes
+	R(2), D(3, 2), E(3, 2), F_(3, 2),                                                    // 4 Notes
+	
+	A(3, 3), G(3, 3), F_(3, 1), G(3, 3), F_(3, 3),                                       // 5 Notes
+	E(3, 2), E(3, 3), R(3), E(3, 4), R(4), E(3, 4), R(4), E(3, 4), R(4), E(3, 4), R(4),  // 11 Notes
+	F_(3, 3), E(3, 3), D(3, 1), D(3, 2),                                                 // 4 Notes
 };
 
 COMPOSE(industry_baby_notes, Industry_Baby, play_industry_baby, 145, 83)
 
 const double bad_apple_notes[52][2] = {
-  	Eb(3, 3), F_(3, 3), Gb(3, 3), Ab(3, 3), Bb(3, 2), Eb(4, 3), Db(4, 3), // 7 Notes
-  	Bb(3, 2), Eb(3, 2), Bb(3, 3), Ab(3, 3), Gb(3, 3), F_(3, 3), // 6 Notes
-  	Eb(3, 3), F_(3, 3), Gb(3, 3), Ab(3, 3), Bb(3, 2), Ab(3, 3), Gb(3, 3), // 7 Notes
-  	F_(3, 3), Eb(3, 3), F_(3, 3), Gb(3, 3), F_(3, 3), Eb(3, 3), D(3, 3), F_(3, 3), // 8 Notes
-  	Eb(3, 3), F_(3, 3), Gb(3, 3), Ab(3, 3), Bb(3, 2), Eb(4, 3), Db(4, 3), // 7 Notes
-  	Bb(3, 2), Eb(3, 2), Bb(3, 3), Ab(3, 3), Gb(3, 3), F_(3, 3), // 6 Notes
-  	Eb(3, 3), F_(3, 3), Gb(3, 3), Ab(3, 3), Bb(3, 2), Ab(3, 3), Gb(3, 3), // 7 Notes
-  	F_(3, 2), Gb(3, 2), Ab(3, 2), Bb(3, 2), // 4 Notes
+ 	Eb(3, 3), F_(3, 3), Gb(3, 3), Ab(3, 3), Bb(3, 2), Eb(4, 3), Db(4, 3),           // 7 Notes
+  	Bb(3, 2), Eb(3, 2), Bb(3, 3), Ab(3, 3), Gb(3, 3), F_(3, 3),                     // 6 Notes
+  	Eb(3, 3), F_(3, 3), Gb(3, 3), Ab(3, 3), Bb(3, 2), Ab(3, 3), Gb(3, 3),           // 7 Notes
+  	F_(3, 3), Eb(3, 3), F_(3, 3), Gb(3, 3), F_(3, 3), Eb(3, 3), D(3, 3), F_(3, 3),  // 8 Notes
+	Eb(3, 3), F_(3, 3), Gb(3, 3), Ab(3, 3), Bb(3, 2), Eb(4, 3), Db(4, 3),           // 7 Notes
+  	Bb(3, 2), Eb(3, 2), Bb(3, 3), Ab(3, 3), Gb(3, 3), F_(3, 3),                     // 6 Notes
+  	Eb(3, 3), F_(3, 3), Gb(3, 3), Ab(3, 3), Bb(3, 2), Ab(3, 3), Gb(3, 3),           // 7 Notes
+  	F_(3, 2), Gb(3, 2), Ab(3, 2), Bb(3, 2),                                         // 4 Notes
 };
 
 COMPOSE(bad_apple_notes, Bad_Apple, play_bad_apple, 138, 52)
 
 const double bad_apple_intro_notes[132][2] = {
-  	Eb(3, 4), Eb(3, 5), R(5), Eb(3, 4), Eb(4, 4), R(4), Eb(4, 4), Db(4, 4), Eb(4, 4), // 9 Notes
-  	Eb(3, 4), Eb(3, 5), R(5), Eb(3, 4), Eb(4, 4), R(4), Eb(4, 4), Db(4, 4), Eb(4, 4), // 9 Notes
-  	Eb(3, 4), Eb(3, 5), R(5), Eb(3, 4), Eb(4, 4), R(4), Eb(4, 4), Db(4, 4), Eb(4, 4), // 9 Notes
-  	Gb(4, 3), Eb(4, 4), Gb(4, 4), Ab(4, 3), Gb(4, 4), Ab(4, 4), // 6 Notes
+  	Eb(3, 4), Eb(3, 5), R(5), Eb(3, 4), Eb(4, 4), R(4), Eb(4, 4), Db(4, 4), Eb(4, 4),  // 9 Notes
+  	Eb(3, 4), Eb(3, 5), R(5), Eb(3, 4), Eb(4, 4), R(4), Eb(4, 4), Db(4, 4), Eb(4, 4),  // 9 Notes
+  	Eb(3, 4), Eb(3, 5), R(5), Eb(3, 4), Eb(4, 4), R(4), Eb(4, 4), Db(4, 4), Eb(4, 4),  // 9 Notes
+  	Gb(4, 3), Eb(4, 4), Gb(4, 4), Ab(4, 3), Gb(4, 4), Ab(4, 4),                        // 6 Notes
 
-  	Eb(3, 4), Eb(3, 5), R(5), Eb(3, 4), Eb(4, 4), R(4), Eb(4, 4), Db(4, 4), Eb(4, 4), // 9 Notes
-  	Eb(3, 4), Eb(3, 5), R(5), Eb(3, 4), Eb(4, 4), R(4), Eb(4, 4), Db(4, 4), Eb(4, 4), // 9 Notes
-  	Eb(3, 4), Eb(3, 5), R(5), Eb(3, 4), Eb(4, 4), R(4), Eb(4, 4), Db(4, 4), Eb(4, 4), // 9 Notes
-  	Ab(4, 3), Gb(4, 4), Ab(4, 4), Gb(4, 3), Eb(4, 4), Gb(4, 4), // 6 Notes
+  	Eb(3, 4), Eb(3, 5), R(5), Eb(3, 4), Eb(4, 4), R(4), Eb(4, 4), Db(4, 4), Eb(4, 4),  // 9 Notes
+  	Eb(3, 4), Eb(3, 5), R(5), Eb(3, 4), Eb(4, 4), R(4), Eb(4, 4), Db(4, 4), Eb(4, 4),  // 9 Notes
+  	Eb(3, 4), Eb(3, 5), R(5), Eb(3, 4), Eb(4, 4), R(4), Eb(4, 4), Db(4, 4), Eb(4, 4),  // 9 Notes
+  	Ab(4, 3), Gb(4, 4), Ab(4, 4), Gb(4, 3), Eb(4, 4), Gb(4, 4),                        // 6 Notes
 
-  	Eb(3, 4), Eb(3, 5), R(5), Eb(3, 4), Eb(4, 4), R(4), Eb(4, 4), Db(4, 4), Eb(4, 4), // 9 Notes
-  	Eb(3, 4), Eb(3, 5), R(5), Eb(3, 4), Eb(4, 4), R(4), Eb(4, 4), Db(4, 4), Eb(4, 4), // 9 Notes
-  	Eb(3, 4), Eb(3, 5), R(5), Eb(3, 4), Eb(4, 4), R(4), Eb(4, 4), Db(4, 4), Eb(4, 4), // 9 Notes
-  	Gb(4, 3), Eb(4, 4), Gb(4, 4), Ab(4, 3), Gb(4, 4), Ab(4, 4), // 6 Notes
+  	Eb(3, 4), Eb(3, 5), R(5), Eb(3, 4), Eb(4, 4), R(4), Eb(4, 4), Db(4, 4), Eb(4, 4),  // 9 Notes
+  	Eb(3, 4), Eb(3, 5), R(5), Eb(3, 4), Eb(4, 4), R(4), Eb(4, 4), Db(4, 4), Eb(4, 4),  // 9 Notes
+ 	Eb(3, 4), Eb(3, 5), R(5), Eb(3, 4), Eb(4, 4), R(4), Eb(4, 4), Db(4, 4), Eb(4, 4),  // 9 Notes
+  	Gb(4, 3), Eb(4, 4), Gb(4, 4), Ab(4, 3), Gb(4, 4), Ab(4, 4),                        // 6 Notes
 
-  	Eb(3, 4), Eb(3, 5), R(5), Eb(3, 4), Eb(4, 4), R(4), Eb(4, 4), Db(4, 4), Eb(4, 4), // 9 Notes
- 	Eb(3, 4), Eb(3, 5), R(5), Eb(3, 4), Eb(4, 4), R(4), Eb(4, 4), Db(4, 4), Eb(4, 4), // 9 Notes
-  	Eb(3, 4), Eb(3, 5), R(5), Eb(3, 4), Eb(4, 4), R(4), Eb(4, 4), Db(4, 4), Eb(4, 4), // 9 Notes
-  	tAb(4, 2, 1), tGb(4, 2, 1), tAb(4, 2, 1), tGb(4, 2, 1), tEb(4, 2, 1), tGb(4, 2, 1), // 6 Notes
+  	Eb(3, 4), Eb(3, 5), R(5), Eb(3, 4), Eb(4, 4), R(4), Eb(4, 4), Db(4, 4), Eb(4, 4),    // 9 Notes
+  	Eb(3, 4), Eb(3, 5), R(5), Eb(3, 4), Eb(4, 4), R(4), Eb(4, 4), Db(4, 4), Eb(4, 4),    // 9 Notes
+ 	Eb(3, 4), Eb(3, 5), R(5), Eb(3, 4), Eb(4, 4), R(4), Eb(4, 4), Db(4, 4), Eb(4, 4),    // 9 Notes
+  	tAb(4, 2, 1), tGb(4, 2, 1), tAb(4, 2, 1), tGb(4, 2, 1), tEb(4, 2, 1), tGb(4, 2, 1),  // 6 Notes
 };
 
 COMPOSE(bad_apple_intro_notes, Bad_Apple_Intro, play_bad_apple_intro, 138, 132)
 
 const double bad_apple_bridge_notes[55][2] = {
-  	Db(4, 3), Eb(4, 3), Bb(3, 3), Ab(3, 3), Bb(3, 2), Ab(3, 3), Bb(3, 3), // 7 Notes
-  	Db(4, 3), Eb(4, 3), Bb(3, 3), Ab(3, 3), Bb(3, 2), Ab(3, 3), Bb(3, 3), // 7 Notes
-  	Ab(3, 3), Gb(3, 3), F_(3, 3), Db(3, 3), Eb(3, 2), Db(3, 3), Eb(3, 3), // 7 Notes
-  	F_(3, 3), Gb(3, 3), Ab(3, 3), Bb(3, 3), Eb(3, 2), Bb(3, 3), Db(4, 3), // 7 Notes
-  	Db(4, 3), Eb(4, 3), Bb(3, 3), Ab(3, 3), Bb(3, 2), Ab(3, 3), Bb(3, 3), // 7 Notes
-  	Db(4, 3), Eb(4, 3), Bb(3, 3), Ab(3, 3), Bb(3, 2), Eb(4, 3), F_(4, 3), // 7 Notes
-  	Gb(4, 3), F_(4, 3), Eb(4, 3), Db(4, 3), Bb(3, 2), Ab(3, 3), Bb(3, 3), // 7 Notes
-  	Ab(3, 3), Gb(3, 3), F_(3, 3), Db(3, 3), Eb(3, 2), R(2), // 6 Notes
+	Db(4, 3), Eb(4, 3), Bb(3, 3), Ab(3, 3), Bb(3, 2), Ab(3, 3), Bb(3, 3),  // 7 Notes
+	Db(4, 3), Eb(4, 3), Bb(3, 3), Ab(3, 3), Bb(3, 2), Ab(3, 3), Bb(3, 3),  // 7 Notes
+	Ab(3, 3), Gb(3, 3), F_(3, 3), Db(3, 3), Eb(3, 2), Db(3, 3), Eb(3, 3),  // 7 Notes
+	F_(3, 3), Gb(3, 3), Ab(3, 3), Bb(3, 3), Eb(3, 2), Bb(3, 3), Db(4, 3),  // 7 Notes
+	Db(4, 3), Eb(4, 3), Bb(3, 3), Ab(3, 3), Bb(3, 2), Ab(3, 3), Bb(3, 3),  // Take A Guess
+  	Db(4, 3), Eb(4, 3), Bb(3, 3), Ab(3, 3), Bb(3, 2), Eb(4, 3), F_(4, 3),  // 7 Notes
+  	Gb(4, 3), F_(4, 3), Eb(4, 3), Db(4, 3), Bb(3, 2), Ab(3, 3), Bb(3, 3),  // 7 Notes
+  	Ab(3, 3), Gb(3, 3), F_(3, 3), Db(3, 3), Eb(3, 2), R(2),                // 6 Notes
 };
 
 COMPOSE_SHIFTED(bad_apple_bridge_notes, Bad_Apple_Bridge, play_bad_apple_bridge, 138, 55, 1)
+
+const double imperial_march_notes[62][2] = {
+	G(3, 3), R(3), G(3, 3), R(3), G(3, 3), R(3), Eb(3, 3), R(4), Bb(3, 4),  // 9 Notes
+	G(3, 2), Eb(3, 3), R(4), Bb(3, 4), G(3, 2), R(2),                       // 6 Notes
+	D(4, 3), R(3), D(4, 3), R(3), D(4, 3), R(3), Eb(4, 3), R(4), Bb(3, 4),  // 9 Notes
+	Gb(3, 2), Eb(3, 3), R(4), Bb(3, 4), G(3, 2), R(2),                      // 6 Notes
+	
+	G(4, 2), G(3, 3), R(4), G(3, 4), G(4, 2), Gb(4, 3), Gb(4, 4), F_(4, 4),                                                                   // 8 Notes
+	E(4, 4), Eb(4, 4), E(4, 3), R(3), Ab(3, 3), Db(4, 2), C(4, 3), C(4, 4), B(3, 4),                                                          // 9 Notes
+	Bb(3, 4), A(3, 4), Bb(3, 3), R(3), Eb(3, 3), Gb(3, 2), Eb(3, 3), Eb(3, 4), Gb(3, 4), Bb(3, 2), G(3, 3), G(3, 4), Bb(3, 4), D(4, 2), R(2)  // 15 Notes
+};
+
+COMPOSE(imperial_march_notes, Imperial_March, play_imperial_march, 80, 62)
+
+const double mean_one_notes[74][2] = {
+	D(4, 1), B(3, 1), Bb(3, 1), tA(3, 2, 1), tR(1, 1),                                                    // 5 Notes - 1.75 Measures
+	tF(3, 2, 1), tR(2, 1), tG(3, 2, 1), tA(3, 1, 1), tD(3, 1, 1), tR(1, 1), R(2),                         // 7 Notes
+	tF(3, 2, 1), tR(2, 1), tA(3, 2, 1), tG(3, 1, 1), tR(2, 1), R(1), tF(3, 2, 1), tR(2, 1), tG(3, 2, 1),  // 9 Notes
+	A(3, 2), tA(3, 1, 1), tD(3, 2, 1), B(3, 2), tB(3, 1, 1), tE(3, 2, 1),                                 // 6 Notes
+	Db(4, 1), R(2), tA(3, 2, 1), tR(2, 1), tA(3, 2, 1),                                                   // 5 Notes
+	
+	tD(4, 1, 1), tC(4, 2, 1), tBb(3, 1, 1), tA(3, 2, 1), tBb(3, 1, 1), tG(3, 2, 1), tG(3, 2, 1), tR(2, 1), tG(3, 2, 1),  // 9 Notes
+	tC(4, 1, 1), tBb(3, 2, 1), tA(3, 1, 1), tG(3, 2, 1), A(3, 2), tF(3, 1, 1), tE(3, 2, 1),                              // 7 Notes
+	D(3, 1), tD(4, 2, 1), tR(1, 1), R(2),                                                                                // 4 Notes
+	tBb(3, 2, 1), tR(2, 1), tBb(3, 3, 1), tR(3, 1), tBb(3, 2, 1), tR(2, 1), tBb(3, 3, 1), tR(3, 1),                      // 8 Notes
+	tBb(3, 2, 1), tR(2, 1), tBb(3, 3, 1), tR(3, 1), tBb(3, 2, 1), tR(2, 1), tBb(3, 2, 1),                                // 7 Notes
+	R(1), tDb(4, 1, 1), tBb(3, 2, 1), Db(4, 2),                                                                          // 4 Notes
+	D(4, 1), D(4, 2), R(2),                                                                                              // 3 Notes
+};
+
+COMPOSE_SHIFTED(mean_one_notes, Mean_One, play_mean_one, 104, 74, 1)
+
+const double virtual_insanity_notes[36][2] = {
+	R(2), tG(4, 2, 1), tA(4, 3, 1), tB(4, 3, 1), tR(3, 1), tB(4, 3, 1),                                       // 7 Notes
+	B(4, 3), A(4, 3), E(4, 3), tD(4, 2, 1), tE(4, 3, 1),                                                      // 5 Notes
+	tE(4, 3, 1), tR(3, 1), tE(4, 3, 1), tR(2, 1), tG(4, 3, 1), G(4, 3), tG(4, 2, 1), tE(4, 3, 1),             // 8 Notes
+	tA(4, 2, 1), tR(3, 1), tA(4, 3, 1), tR(3, 1), tG(4, 2, 1), tR(3, 1), tD(4, 3, 1), tR(2, 1), tE(4, 3, 1),  // 9 Notes
+	tE(4, 3, 1), tR(3, 1), tE(4, 3, 1), tR(2, 1), tE(4, 3, 1), tE(4, 1, 1), tR(2, 1),                         // 7 Notes
+};
+
+COMPOSE(virtual_insanity_notes, Virtual_Insanity, play_virtual_insanity, 93, 36)
 
 
 
