@@ -3,13 +3,16 @@
 #include <WiFiClientSecure.h>
 #include <Adafruit_NeoPixel.h>
 #include "jingle.h"
+#include "UserSongs.h"
+
 
 const char* ssidSchool = "MCS_Guest";
 const char* ssidHome = "MCS_Guest";
 const char* password = "";
 bool atSchool = false;
 
-const char* firebaseURL = "https://doorbell-338a5-default-rtdb.firebaseio.com/ALERT.json";
+const char* firebaseALERT = "https://doorbell-338a5-default-rtdb.firebaseio.com/ALERT.json";
+const char* firebaseUSER = "https://doorbell-338a5-default-rtdb.firebaseio.com/USER.json";
 unsigned long previousMillis = 0;
 const long valueCheckInterval = 1000;
 const long resetInterval = valueCheckInterval - 500;
@@ -25,6 +28,12 @@ Adafruit_NeoPixel strip(NUM_LEDS, LED_PIN, NEO_GRB + NEO_KHZ800);
 
 // Buzzer Ping
 int buzzerPin = D6;
+
+// Defines the data I pull from firebase
+struct FirebaseData {
+    String alertValue;
+    String userValue;
+};
 
 void connectToWiFi() {
     Serial.println("Attempting to connect to WiFi...");
@@ -105,34 +114,57 @@ void turnOffBuzzer() {
 }
 
 // Function to get data from Firebase
-String getDataFromFirebase() {
+FirebaseData getDataFromFirebase() {
+    FirebaseData data = {"", ""};
+
     if (WiFi.status() == WL_CONNECTED) {
         WiFiClientSecure client;
         client.setInsecure();
         HTTPClient http;
 
+        // Pull the ALERT value
         Serial.print("Connecting to ");
-        Serial.println(firebaseURL);
-
-        http.begin(client, firebaseURL);
+        Serial.println(firebaseALERT);
+        http.begin(client, firebaseALERT);
         int httpCode = http.GET();
-        String payload = "";
 
         if (httpCode > 0) {
             Serial.printf("HTTP GET code: %d\n", httpCode);
             if (httpCode == HTTP_CODE_OK) {
-                payload = http.getString();
+                data.alertValue = http.getString();
             }
         } else {
             Serial.printf("GET request failed, error: %s\n", http.errorToString(httpCode).c_str());
         }
-
         http.end();
-        return payload;
+
+        // Pull the USER value
+        Serial.print("Connecting to ");
+        Serial.println(firebaseUSER);
+        http.begin(client, firebaseUSER);
+        httpCode = http.GET();
+
+        if (httpCode > 0) {
+            Serial.printf("HTTP GET code: %d\n", httpCode);
+            if (httpCode == HTTP_CODE_OK) {
+                data.userValue = http.getString();
+            }
+        } else {
+            Serial.printf("GET request failed, error: %s\n", http.errorToString(httpCode).c_str());
+        }
+        http.end();
     } else {
         Serial.println("WiFi not connected");
-        return "";
     }
+
+    return data;
+}
+
+String trimQuotes(String str) {
+    if (str.startsWith("\"") && str.endsWith("\"")) {
+        return str.substring(1, str.length() - 1); // Remove the first and last characters
+    }
+    return str;
 }
 
 void loop() {
@@ -153,31 +185,53 @@ void loop() {
     // Fetch the Firebase data every 5 seconds
     if (currentMillis - previousMillis >= valueCheckInterval) {
         previousMillis = currentMillis;
-        
-        // Call getDataFromFirebase and store the result in a variable
-        String firebaseValue = getDataFromFirebase();
 
-        Serial.print("Received Firebase value: ");
-        Serial.println(firebaseValue);
-        
+        // Get both ALERT and USER values
+        FirebaseData firebaseData = getDataFromFirebase();
+
+        Serial.print("Received ALERT value: ");
+        Serial.println(firebaseData.alertValue);
+        Serial.print("Received USER value: ");
+        Serial.println(firebaseData.userValue);
+
         // Check the Firebase value
-        if (firebaseValue == "true") {
+        if (firebaseData.alertValue == "true") {
+            // Remove quotes from userValue
+            String trimmedUserValue = trimQuotes(firebaseData.userValue);
+
             alertActive = true;
             alertResetMillis = currentMillis;
             turnOnLEDStrip(); // Turn on LED strip when ALERT is true
-            //turnOnBuzzer(); // Turn on Buzzer
-            play_industry_baby();
+
+            // Find the user in the array and play their song
+            bool userFound = false;
+            for (int i = 0; i < userCount; i++) {
+                if (userSongs[i].userName == trimmedUserValue) {
+                    userSongs[i].playSong(); // Call the song function
+                    Serial.print("Playing song for ");
+                    Serial.println(userSongs[i].userName);
+                    userFound = true;
+                    break;
+                }
+            }
+
+            if (!userFound) {
+                Serial.println("No song found for this user.");
+                turnOnBuzzer();
+            }
+
             // Turn on the LED if the value is true
             digitalWrite(LED_BUILTIN, LOW); // Turn LED on (LOW is on for built-in LED)
             ledState = LOW;                 // Ensure LED stays on
-        } else if (firebaseValue == "false") {
+        } else if (firebaseData.alertValue == "false") {
             turnOffLEDStrip(); // Turn off LED strip when ALERT is false
-            turnOffBuzzer(); //Turn off the Buzzer
+            turnOffBuzzer();   // Turn off the Buzzer
             // Turn off the LED if the value is false
             digitalWrite(LED_BUILTIN, HIGH);
-            ledState = HIGH;  
+            ledState = HIGH;
         } else {
             Serial.println("No valid data received from Firebase.");
         }
     }
 }
+
