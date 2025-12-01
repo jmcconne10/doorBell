@@ -6,27 +6,27 @@
 #define LED_BUILTIN 2   // Onboard LED is usually GPIO2 on ESP32 DevKit V1
 #endif
 
-#include <WiFi.h>              // CHANGED: ESP32 WiFi
-#include <HTTPClient.h>        // CHANGED: ESP32 HTTP client
+#include <WiFi.h>              // ESP32 WiFi
+#include <HTTPClient.h>        // ESP32 HTTP client
 #include <WiFiClientSecure.h>
 #include <Adafruit_NeoPixel.h>
 #include "jingle.h"
 #include "UserSongs.h"
 
 const char* ssidSchool = "MCS_Guest";
-const char* ssidHome = "Bell_Test";
-const char* password = "mcconnell6";
-bool atSchool = false;
+const char* ssidHome   = "Bell_Test";
+const char* password   = "";   // Home WiFi password
+bool atSchool = false;                   // Now unused, but left for minimal change
 
 const char* firebaseALERT = "https://doorbell-338a5-default-rtdb.firebaseio.com/ALERT.json";
-const char* firebaseUSER = "https://doorbell-338a5-default-rtdb.firebaseio.com/USER.json";
+const char* firebaseUSER  = "https://doorbell-338a5-default-rtdb.firebaseio.com/USER.json";
 unsigned long previousMillis = 0;
 const long valueCheckInterval = 1000;
 const long resetInterval = valueCheckInterval - 500;
 unsigned long alertResetMillis = 0;
 bool alertActive = false;
 bool ledState = LOW; // Used for built-in LED
-int rev = 50; //Used to help identify what code is on esp
+int rev = 50;        // Used to help identify what code is on esp
 
 // LED strip settings
 #define LED_PIN    D5      // Pin connected to the data line of the LEDs (uses alias above)
@@ -46,18 +46,32 @@ void connectToWiFi() {
     Serial.println("Attempting to connect to WiFi...");
     WiFi.mode(WIFI_STA);
 
-    if (atSchool) {
-        WiFi.begin(ssidSchool);
-        Serial.println("At School");
+    // NEW: Scan and auto-pick school vs home
+    Serial.println("Scanning for available WiFi networks...");
+    int found = WiFi.scanNetworks();
+    bool schoolFound = false;
+
+    for (int i = 0; i < found; i++) {
+        Serial.print("Found SSID: ");
+        Serial.println(WiFi.SSID(i));
+
+        if (WiFi.SSID(i) == ssidSchool) {
+            schoolFound = true;
+        }
+    }
+
+    if (schoolFound) {
+        Serial.println("School SSID detected. Connecting to school (open network)...");
+        WiFi.begin(ssidSchool);              // School guest assumed open / no password
     } else {
-        WiFi.begin(ssidHome, password);
-        Serial.println("At Home");
+        Serial.println("School SSID not detected. Connecting to home...");
+        WiFi.begin(ssidHome, password);      // Home uses password
     }
 
     while (WiFi.status() != WL_CONNECTED) {
         // Blink the first LED in the strip to green while trying to connect
         strip.setPixelColor(0, strip.Color(0, 255, 0)); // Green color
-        digitalWrite(LED_BUILTIN, LOW); // Turn LED on
+        digitalWrite(LED_BUILTIN, LOW);  // Turn LED on
         strip.show();
         delay(500);
         strip.setPixelColor(0, strip.Color(0, 0, 0)); // Turn off the LED
