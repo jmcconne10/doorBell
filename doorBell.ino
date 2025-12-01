@@ -6,6 +6,10 @@
 #define LED_BUILTIN 2   // Onboard LED is usually GPIO2 on ESP32 DevKit V1
 #endif
 
+// LED polarity helpers (for your board: HIGH = ON, LOW = OFF)
+#define LED_ON  HIGH
+#define LED_OFF LOW
+
 #include <WiFi.h>              // ESP32 WiFi
 #include <HTTPClient.h>        // ESP32 HTTP client
 #include <WiFiClientSecure.h>
@@ -15,8 +19,8 @@
 
 const char* ssidSchool = "MCS_Guest";
 const char* ssidHome   = "Bell_Test";
-const char* password   = "";   // Home WiFi password
-bool atSchool = false;                   // Now unused, but left for minimal change
+const char* password   = "mcconnell6";   // Home WiFi password
+bool atSchool = false;                   // Now unused, kept for minimal diff
 
 const char* firebaseALERT = "https://doorbell-338a5-default-rtdb.firebaseio.com/ALERT.json";
 const char* firebaseUSER  = "https://doorbell-338a5-default-rtdb.firebaseio.com/USER.json";
@@ -25,7 +29,7 @@ const long valueCheckInterval = 1000;
 const long resetInterval = valueCheckInterval - 500;
 unsigned long alertResetMillis = 0;
 bool alertActive = false;
-bool ledState = LOW; // Used for built-in LED
+bool ledState = LOW; // legacy, not really used for logic anymore
 int rev = 50;        // Used to help identify what code is on esp
 
 // LED strip settings
@@ -42,72 +46,164 @@ struct FirebaseData {
     String userValue;
 };
 
+// ---------- BUILT-IN LED STATUS STATE MACHINE ----------
+
+enum LedMode {
+    LED_MODE_WIFI_OK,     // solid ON
+    LED_MODE_ALERT,       // fast blink
+    LED_MODE_WIFI_DOWN    // slow blink
+};
+
+LedMode ledMode = LED_MODE_WIFI_DOWN;
+unsigned long lastLedMillis = 0;
+bool statusLedOn = false;
+
+void setLedMode(LedMode newMode) {
+    if (ledMode != newMode) {
+        ledMode = newMode;
+        lastLedMillis = 0;
+        statusLedOn = false;
+        digitalWrite(LED_BUILTIN, LED_OFF); // start from OFF
+    }
+}
+
+void updateStatusLed() {
+    unsigned long now = millis();
+
+    switch (ledMode) {
+        case LED_MODE_WIFI_OK:
+            // Solid ON
+            digitalWrite(LED_BUILTIN, LED_ON);
+            statusLedOn = true;
+            break;
+
+        case LED_MODE_ALERT:
+            Serial.println("LED_MODE_ALERT Triggered");
+            // Fast blink (every 200 ms)
+            if (now - lastLedMillis >= 200) {
+                lastLedMillis = now;
+                statusLedOn = !statusLedOn;
+                digitalWrite(LED_BUILTIN, statusLedOn ? LED_ON : LED_OFF);
+                Serial.println("LED_MODE_ALERT Triggered");
+            }
+            break;
+
+        case LED_MODE_WIFI_DOWN:
+            // Slow blink (every 1000 ms)
+            if (now - lastLedMillis >= 1000) {
+                lastLedMillis = now;
+                statusLedOn = !statusLedOn;
+                digitalWrite(LED_BUILTIN, statusLedOn ? LED_ON : LED_OFF);
+            }
+            break;
+    }
+}
+
+// ---------- WIFI CONNECT ----------
+
 void connectToWiFi() {
     Serial.println("Attempting to connect to WiFi...");
     WiFi.mode(WIFI_STA);
+    WiFi.setSleep(false);
 
-    // NEW: Scan and auto-pick school vs home
-    Serial.println("Scanning for available WiFi networks...");
-    int found = WiFi.scanNetworks();
-    bool schoolFound = false;
+    // Optional: give the WiFi radio a moment to come up
+    delay(500);
 
-    for (int i = 0; i < found; i++) {
-        Serial.print("Found SSID: ");
-        Serial.println(WiFi.SSID(i));
+    const int maxScanAttempts = 3;
+    bool schoolFound = true;
 
-        if (WiFi.SSID(i) == ssidSchool) {
-            schoolFound = true;
+    for (int attempt = 1; attempt <= maxScanAttempts && !schoolFound; attempt++) {
+        Serial.print("WiFi scan attempt ");
+        Serial.print(attempt);
+        Serial.println("...");
+
+        int found = WiFi.scanNetworks();
+        Serial.print("  Networks found: ");
+        Serial.println(found);
+
+        for (int i = 0; i < found; i++) {
+            String ssid = WiFi.SSID(i);
+            Serial.print("  SSID[");
+            Serial.print(i);
+            Serial.print("]: ");
+            Serial.println(ssid);
+
+            if (ssid == ssidSchool) {
+                schoolFound = true;
+                Serial.println("  --> Matched school SSID!");
+                break;
+            }
+        }
+
+        if (!schoolFound && attempt < maxScanAttempts) {
+            Serial.println("School SSID not found, waiting before next scan...");
+            delay(2000);  // wait 2s before scanning again
         }
     }
 
     if (schoolFound) {
-        Serial.println("School SSID detected. Connecting to school (open network)...");
+        Serial.println("School SSID detected. Connecting to SCHOOL (open network)...");
         WiFi.begin(ssidSchool);              // School guest assumed open / no password
     } else {
-        Serial.println("School SSID not detected. Connecting to home...");
+        Serial.println("School SSID NOT detected after retries. Connecting to HOME...");
         WiFi.begin(ssidHome, password);      // Home uses password
     }
 
+    // While connecting, blink NeoPixel #0 green and built-in LED
     while (WiFi.status() != WL_CONNECTED) {
-        // Blink the first LED in the strip to green while trying to connect
-        strip.setPixelColor(0, strip.Color(0, 255, 0)); // Green color
-        digitalWrite(LED_BUILTIN, LOW);  // Turn LED on
+        strip.setPixelColor(0, strip.Color(0, 255, 0)); // Green
         strip.show();
-        delay(500);
-        strip.setPixelColor(0, strip.Color(0, 0, 0)); // Turn off the LED
+        digitalWrite(LED_BUILTIN, LED_ON);
+        delay(250);
+
+        strip.setPixelColor(0, strip.Color(0, 0, 0)); // Off
         strip.show();
-        digitalWrite(LED_BUILTIN, HIGH); // Turn LED off
-        delay(500);
+        digitalWrite(LED_BUILTIN, LED_OFF);
+        delay(250);
+
         Serial.print(".");
     }
+
     strip.setPixelColor(0, strip.Color(0, 0, 0)); // Turn off the LED after connection
     strip.show();
-    Serial.println("");
+
+    Serial.println();
     Serial.print("Rev ");
     Serial.println(rev);
     Serial.println("\nConnected to WiFi!");
     Serial.print("IP Address: ");
     Serial.println(WiFi.localIP());
+
+    // Now that we're connected and idle => WiFi OK mode
+    setLedMode(LED_MODE_WIFI_OK);
 }
+
+// ---------- SETUP ----------
 
 void setup() {
     Serial.begin(115200);
     delay(100);
     Serial.println();
-    pinMode(LED_BUILTIN, OUTPUT);  // Set built-in LED as output
+
+    pinMode(LED_BUILTIN, OUTPUT);   // Set built-in LED as output
+    digitalWrite(LED_BUILTIN, LED_OFF); // Start off
 
     // Initialize LED strip
     strip.begin();
     strip.setBrightness(50);
     strip.show(); // Initialize all pixels to 'off'
 
-    pinMode(LED_BUILTIN, OUTPUT);
     pinMode(buzzerPin, OUTPUT);
     delay(1000);
+
+    // Initially, WiFi is down
+    setLedMode(LED_MODE_WIFI_DOWN);
 
     // Connect to WiFi
     connectToWiFi();
 }
+
+// ---------- LED STRIP & BUZZER HELPERS ----------
 
 // Function to turn on the LED strip (set all LEDs to red)
 void turnOnLEDStrip() {
@@ -135,7 +231,8 @@ void turnOffBuzzer() {
   noTone(buzzerPin); // Stop the tone
 }
 
-// Function to get data from Firebase
+// ---------- FIREBASE ----------
+
 FirebaseData getDataFromFirebase() {
     FirebaseData data = {"", ""};
 
@@ -189,19 +286,22 @@ String trimQuotes(String str) {
     return str;
 }
 
+// ---------- MAIN LOOP ----------
+
 void loop() {
     unsigned long currentMillis = millis();
 
     // Reconnect to WiFi if disconnected
     if (WiFi.status() != WL_CONNECTED) {
         Serial.println("WiFi lost connection, attempting to reconnect...");
+        setLedMode(LED_MODE_WIFI_DOWN);
         WiFi.disconnect();
         delay(1000);
         connectToWiFi();
     } else {
-        strip.setPixelColor(0, strip.Color(0, 0, 255)); // Turn LED to blue when connected to wifi
+        // Show blue on NeoPixel 0 when connected
+        strip.setPixelColor(0, strip.Color(0, 0, 255));
         strip.show();
-        digitalWrite(LED_BUILTIN, LOW); // Turn LED on
     }
 
     // Fetch the Firebase data every 1 second
@@ -242,17 +342,25 @@ void loop() {
                 turnOnBuzzer();
             }
 
-            // Turn on the LED if the value is true
-            digitalWrite(LED_BUILTIN, LOW); // Turn LED on
-            ledState = LOW;                 // Ensure LED stays on
+            // Built-in LED: alert mode = fast blink
+            setLedMode(LED_MODE_ALERT);
+
         } else if (firebaseData.alertValue == "false") {
+            alertActive = false;
             turnOffLEDStrip(); // Turn off LED strip when ALERT is false
             turnOffBuzzer();   // Turn off the Buzzer
-            // Turn off the LED if the value is false
-            digitalWrite(LED_BUILTIN, HIGH);
-            ledState = HIGH;
+
+            // LED mode depends on WiFi state
+            if (WiFi.status() == WL_CONNECTED) {
+                setLedMode(LED_MODE_WIFI_OK);   // Solid ON
+            } else {
+                setLedMode(LED_MODE_WIFI_DOWN); // Slow blink
+            }
         } else {
             Serial.println("No valid data received from Firebase.");
         }
     }
+
+    // Update built-in status LED pattern
+    updateStatusLed();
 }
