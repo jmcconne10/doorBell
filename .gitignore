@@ -5,3 +5,4 @@ bot_env/
 serviceAccountKey.json
 .DS_Store
 venv/
+.DS_Store
