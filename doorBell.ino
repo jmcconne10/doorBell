@@ -1,5 +1,5 @@
-#define D5 18      // NeoPixel data pin (GPIO18)
-#define D6 19      // Buzzer pin (GPIO19)
+#define D13 13      // NeoPixel data pin (GPIO18)
+#define D12 12      // Buzzer pin (GPIO19)
 
 // Define built-in LED for ESP32 DevKit if not already defined
 #ifndef LED_BUILTIN
@@ -19,7 +19,7 @@
 
 const char* ssidSchool = "MCS_Guest";
 const char* ssidHome   = "Bell_Test";
-const char* password   = "mcconnell6";   // Home WiFi password
+const char* password   = "";   // Home WiFi password
 bool atSchool = false;                   // Now unused, kept for minimal diff
 
 const char* firebaseALERT = "https://doorbell-338a5-default-rtdb.firebaseio.com/ALERT.json";
@@ -33,12 +33,12 @@ bool ledState = LOW; // legacy, not really used for logic anymore
 int rev = 50;        // Used to help identify what code is on esp
 
 // LED strip settings
-#define LED_PIN    D5      // Pin connected to the data line of the LEDs (uses alias above)
+#define LED_PIN    D13      // Pin connected to the data line of the LEDs (uses alias above)
 #define NUM_LEDS   300     // Number of LEDs in your strip
 Adafruit_NeoPixel strip(NUM_LEDS, LED_PIN, NEO_GRB + NEO_KHZ800);
 
 // Buzzer Ping
-int buzzerPin = D6;
+int buzzerPin = D12;
 
 // Defines the data I pull from firebase
 struct FirebaseData {
@@ -104,13 +104,13 @@ void updateStatusLed() {
 void connectToWiFi() {
     Serial.println("Attempting to connect to WiFi...");
     WiFi.mode(WIFI_STA);
-    WiFi.setSleep(false);
 
     // Optional: give the WiFi radio a moment to come up
     delay(500);
 
     const int maxScanAttempts = 3;
-    bool schoolFound = true;
+    bool schoolFound = false;
+    WiFi.setSleep(false);
 
     for (int attempt = 1; attempt <= maxScanAttempts && !schoolFound; attempt++) {
         Serial.print("WiFi scan attempt ");

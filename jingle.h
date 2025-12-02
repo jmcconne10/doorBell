@@ -9,7 +9,7 @@
 
 
 
-#define AUDIO_PIN D6
+#define AUDIO_PIN D12
 
 #define COMPOSE(note_sheet, song_name, function_name, tempo, length) \
 const auto song_name = Song<tempo, length>(note_sheet); \
