@@ -104,67 +104,61 @@ void updateStatusLed() {
 void connectToWiFi() {
     Serial.println("Attempting to connect to WiFi...");
     WiFi.mode(WIFI_STA);
-
-    // Optional: give the WiFi radio a moment to come up
-    delay(500);
-
-    const int maxScanAttempts = 3;
-    bool schoolFound = false;
     WiFi.setSleep(false);
 
-    for (int attempt = 1; attempt <= maxScanAttempts && !schoolFound; attempt++) {
-        Serial.print("WiFi scan attempt ");
-        Serial.print(attempt);
-        Serial.println("...");
+    // Give radio a moment
+    delay(500);
 
-        int found = WiFi.scanNetworks();
-        Serial.print("  Networks found: ");
-        Serial.println(found);
+    // --- Scan once just to see if we're at HOME (SSID "Loading") ---
+    bool loadingFound = false;
 
-        for (int i = 0; i < found; i++) {
-            String ssid = WiFi.SSID(i);
-            Serial.print("  SSID[");
-            Serial.print(i);
-            Serial.print("]: ");
-            Serial.println(ssid);
+    Serial.println("Scanning for WiFi networks...");
+    int found = WiFi.scanNetworks();
+    Serial.print("  Networks found: ");
+    Serial.println(found);
 
-            if (ssid == ssidSchool) {
-                schoolFound = true;
-                Serial.println("  --> Matched school SSID!");
-                break;
-            }
-        }
+    for (int i = 0; i < found; i++) {
+        String ssid = WiFi.SSID(i);
+        Serial.print("  SSID[");
+        Serial.print(i);
+        Serial.print("]: ");
+        Serial.println(ssid);
 
-        if (!schoolFound && attempt < maxScanAttempts) {
-            Serial.println("School SSID not found, waiting before next scan...");
-            delay(2000);  // wait 2s before scanning again
+        if (ssid == "Loading") {      // <--- HOME marker
+            loadingFound = true;
+            Serial.println("  --> Detected HOME marker SSID 'Loading'");
         }
     }
 
-    if (schoolFound) {
-        Serial.println("School SSID detected. Connecting to SCHOOL (open network)...");
-        WiFi.begin(ssidSchool);              // School guest assumed open / no password
+    if (loadingFound) {
+        // We're at home: connect to home WiFi
+        Serial.println("Connecting to HOME (Bell_Test)...");
+        WiFi.begin(ssidHome, password);
     } else {
-        Serial.println("School SSID NOT detected after retries. Connecting to HOME...");
-        WiFi.begin(ssidHome, password);      // Home uses password
+        // No "Loading" seen: force school guest network
+        Serial.println("No 'Loading' SSID detected. Forcing SCHOOL network (MCS_Guest)...");
+        WiFi.begin(ssidSchool);   // open network, no password
     }
 
-    // While connecting, blink NeoPixel #0 green and built-in LED
+    // --- Connect loop: keep trying until we get WL_CONNECTED ---
     while (WiFi.status() != WL_CONNECTED) {
+        // Blink NeoPixel #0 green and built-in LED while trying
         strip.setPixelColor(0, strip.Color(0, 255, 0)); // Green
         strip.show();
         digitalWrite(LED_BUILTIN, LED_ON);
         delay(250);
 
-        strip.setPixelColor(0, strip.Color(0, 0, 0)); // Off
+        strip.setPixelColor(0, strip.Color(0, 0, 0));   // Off
         strip.show();
         digitalWrite(LED_BUILTIN, LED_OFF);
         delay(250);
 
         Serial.print(".");
+        // Optional: you could periodically call WiFi.begin(ssidSchool) again here
     }
 
-    strip.setPixelColor(0, strip.Color(0, 0, 0)); // Turn off the LED after connection
+    // Clear pixel once connected
+    strip.setPixelColor(0, strip.Color(0, 0, 0));
     strip.show();
 
     Serial.println();
@@ -177,6 +171,7 @@ void connectToWiFi() {
     // Now that we're connected and idle => WiFi OK mode
     setLedMode(LED_MODE_WIFI_OK);
 }
+
 
 // ---------- SETUP ----------
 
